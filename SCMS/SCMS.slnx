@@ -1,0 +1,7 @@
+<Solution>
+  <Configurations>
+    <Platform Name="x64" />
+    <Platform Name="x86" />
+  </Configurations>
+  <Project Path="SCMS.vcxproj" Id="386143c1-497a-4641-a9ab-2f47bc684244" />
+</Solution>

@@ -1,6 +1,6 @@
 
 
-
+//member 1
 #include <iostream>
 #include<string>
 #include<fstream>
@@ -140,6 +140,6 @@ private:
 		}
 	};
 
-
+	//member 2
 
 

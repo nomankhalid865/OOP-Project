@@ -1,6 +1,3 @@
-
-
-//member 1
 #include <iostream>
 #include<string>
 #include<fstream>
@@ -11,11 +8,11 @@ class capacityExceeded {
 public:
 	string what() {
 		return "Capacity Exceeded";
-	})
+	}
 };
 class overDue {
 private:
-	doube fine;
+	double fine;
 public:
 	overDue(double f) {
 		fine = f;
@@ -37,11 +34,11 @@ private:
 	int age;
 public:
 	Person(string n, string c, string con, int a) :
-		name(n), CNIC(c), contact(cont), age(a) {
+		name(n), CNIC(c), contact(con), age(a) {
 	}
 		
 	virtual ~Person(){}
-	virtual void displayInfo()=0
+	virtual void displayInfo() = 0;
 	string getName() {
 		return name;
 	}
@@ -56,7 +53,7 @@ public:
 	}
 };
 
-class Student :public Person {
+class Student : public Person {
 private:
 	int rollNo;
 	int semester;
@@ -141,6 +138,53 @@ private:
 	};
 
 	//member 2
+
+	class Course {
+	private:
+		string courseCode, courseName;
+		int creditHours, maxCapacity, enrolledCount;
+		string instructorName;
+		Student* enrolledStudents[30];
+	public:
+		Course(string code, string name, int hours, int capacity)
+			: courseCode(code), courseName(name), creditHours(hours), maxCapacity(capacity), enrolledCount(0) {
+		}
+
+		// Encapsulation
+		string getCourseCode() { return courseCode; }
+		string getCourseName() { return courseName; }
+		void setInstructor(string name) { instructorName = name; }
+
+		// Operator overloading (==)
+		bool operator==(Course& other) {
+			return courseCode == other.courseCode;
+		}
+
+		// Friend function for << operator
+		friend ostream& operator<<(ostream& out, Course& c) {
+			out << "Course: " << c.courseName << " (" << c.courseCode << ") | Credits: " << c.creditHours;
+			return out;
+		}
+
+		// Operator + to merge waiting lists
+		string operator+(Course& other) {
+			return "Merged: " + courseName + " with " + other.courseName;
+		}
+
+		bool enrollStudent(Student* s) {
+			if (enrolledCount >= maxCapacity) {
+				throw CapacityExceededException();
+			}
+			enrolledStudents[enrolledCount] = s;
+			enrolledCount++;
+			s->addCourse(courseName);
+			return true;
+		}
+
+		void displayCourse() {
+			cout << *this << " | Enrolled: " << enrolledCount << "/" << maxCapacity << endl;
+		}
+	};
 
 
 
@@ -287,6 +331,92 @@ private:
 	//member 2
 
 
+	class Invoice {
+	private:
+		int invoiceID;
+		string date;
+		double totalAmount;
+		static int invoiceCounter; // Static member
+
+	public:
+		Invoice(string d, double amount) : date(d), totalAmount(amount) {
+			invoiceCounter++;
+			invoiceID = invoiceCounter;
+		}
+
+		// Copy constructor
+		Invoice(const Invoice& other) {
+			invoiceID = other.invoiceID;
+			date = other.date;
+			totalAmount = other.totalAmount;
+		}
+
+		// Destructor
+		~Invoice() {
+			cout << "Invoice " << invoiceID << " destroyed" << endl;
+		}
+
+		static int getInvoiceCounter() {
+			return invoiceCounter;
+		}
+
+		void display() {
+			cout << "Invoice #" << invoiceID << " | Date: " << date << " | Total: Rs." << totalAmount << endl;
+		}
+	};
+
+	int Invoice::invoiceCounter = 0;
+
+	class FeeRecord {
+	private:
+		int studentRollNo;
+		double semesterFee, hostelFee, libraryFine, totalPaid, balance;
+
+	public:
+		FeeRecord(int roll, double sFee, double hFee)
+			: studentRollNo(roll), semesterFee(sFee), hostelFee(hFee), libraryFine(0), totalPaid(0), balance(sFee + hFee) {
+		}
+
+		// Copy constructor (Deep Copy)
+		FeeRecord(const FeeRecord& other) {
+			studentRollNo = other.studentRollNo;
+			semesterFee = other.semesterFee;
+			hostelFee = other.hostelFee;
+			libraryFine = other.libraryFine;
+			totalPaid = other.totalPaid;
+			balance = other.balance;
+		}
+
+		// Copy assignment operator
+		FeeRecord& operator=(const FeeRecord& other) {
+			if (this != &other) {
+				studentRollNo = other.studentRollNo;
+				semesterFee = other.semesterFee;
+				hostelFee = other.hostelFee;
+				libraryFine = other.libraryFine;
+				totalPaid = other.totalPaid;
+				balance = other.balance;
+			}
+			return *this;
+		}
+
+		// Operator -= overloading
+		void operator-=(double amount) {
+			totalPaid += amount;
+			balance -= amount;
+			cout << "Payment of Rs." << amount << " recorded. Remaining balance: Rs." << balance << endl;
+		}
+
+		void addFine(double fine) {
+			libraryFine = fine;
+			balance += fine;
+		}
+
+		void display() {
+			cout << "Student Roll: " << studentRollNo << " | Balance: Rs." << balance << " | Paid: Rs." << totalPaid << endl;
+		}
+	};
+
 
 
 
@@ -408,4 +538,366 @@ private:
 		};
 
 
+		//member 2
 
+		class Utils {
+		public:
+			static string formatDate(int day, int month, int year) {
+				// Simple concatenation without to_string
+				string date = "";
+				date += char(day / 10 + '0');
+				date += char(day % 10 + '0');
+				date += "/";
+				date += char(month / 10 + '0');
+				date += char(month % 10 + '0');
+				date += "/";
+				date += char(year / 1000 + '0');
+				date += char((year / 100) % 10 + '0');
+				date += char((year / 10) % 10 + '0');
+				date += char(year % 10 + '0');
+				return date;
+			}
+
+			static bool validateAge(int age) {
+				return age >= 16 && age <= 100;
+			}
+
+			static void printLine() {
+				cout << "========================================" << endl;
+			}
+
+			static int getIntInput(string prompt) {
+				int value;
+				cout << prompt;
+				cin >> value;
+				return value;
+			}
+
+			static string getStringInput(string prompt) {
+				string value;
+				cout << prompt;
+				cin.ignore();
+				getline(cin, value);
+				return value;
+			}
+
+			static double getDoubleInput(string prompt) {
+				double value;
+				cout << prompt;
+				cin >> value;
+				return value;
+			}
+		};
+
+		class Reports {
+		public:
+			static void generateCampusReport(Student* students[], int studentCount, Library* lib) {
+				Utils::printLine();
+				cout << "=== CAMPUS REPORT ===" << endl;
+				Utils::printLine();
+
+				cout << "\nSTUDENTS:" << endl;
+				for (int i = 0; i < studentCount; i++) {
+					students[i]->displayInfo();
+				}
+
+				cout << "\nLIBRARY STATUS:" << endl;
+				lib->displayCatalog();
+
+				Utils::printLine();
+			}
+
+			static void sortStudentsByGPA(Student* students[], int count) {
+				for (int i = 0; i < count - 1; i++) {
+					for (int j = 0; j < count - i - 1; j++) {
+						if (students[j]->getGPA() < students[j + 1]->getGPA()) {
+							Student* temp = students[j];
+							students[j] = students[j + 1];
+							students[j + 1] = temp;
+						}
+					}
+				}
+				cout << "Students sorted by GPA!" << endl;	
+			}
+		};	
+			
+		int main() {
+			cout << "\n========== SMART CAMPUS MANAGEMENT SYSTEM ==========\n" << endl;
+
+			// Arrays to store data
+			Student* students[50];
+			int studentCount = 0;
+
+			Course* courses[20];
+			int courseCount = 0;
+
+			int choice;
+
+			do {
+				cout << "\n========== MAIN MENU ==========" << endl;
+				cout << "1. Add Student" << endl;
+				cout << "2. Add Faculty" << endl;
+				cout << "3. Add Course" << endl;
+				cout << "4. Enroll Student in Course" << endl;
+				cout << "5. Library Management" << endl;
+				cout << "6. Fee Management" << endl;
+				cout << "7. Hostel Management" << endl;
+				cout << "8. Generate Reports" << endl;
+				cout << "9. Display All Students" << endl;
+				cout << "0. Exit" << endl;
+				cout << "Enter your choice: ";
+				cin >> choice;
+
+				switch (choice) {
+				case 1: {
+					// Add Student
+					string name, cnic, contact;
+					int age, rollNo, semester;
+					double gpa;
+
+					cout << "\n--- Add New Student ---" << endl;
+					cout << "Enter Name: ";
+					cin.ignore();
+					getline(cin, name);
+					cout << "Enter CNIC: ";
+					getline(cin, cnic);
+					cout << "Enter Age: ";
+					cin >> age;
+					cout << "Enter Contact: ";
+					cin.ignore();
+					getline(cin, contact);
+					cout << "Enter Roll No: ";
+					cin >> rollNo;
+					cout << "Enter Semester: ";
+					cin >> semester;
+					cout << "Enter GPA: ";
+					cin >> gpa;
+
+					students[studentCount] = new Student(name, cnic, age, contact, rollNo, semester, gpa);
+					studentCount++;
+					cout << "Student added successfully!" << endl;
+					break;
+				}
+
+				case 2: {
+					// Add Faculty
+					string name, cnic, contact, department, designation;
+					int age, empID;
+
+					cout << "\n--- Add New Faculty ---" << endl;
+					cout << "Enter Name: ";
+					cin.ignore();
+					getline(cin, name);
+					cout << "Enter CNIC: ";
+					getline(cin, cnic);
+					cout << "Enter Age: ";
+					cin >> age;
+					cout << "Enter Contact: ";
+					cin.ignore();
+					getline(cin, contact);
+					cout << "Enter Employee ID: ";
+					cin >> empID;
+					cout << "Enter Department: ";
+					cin.ignore();
+					getline(cin, department);
+					cout << "Enter Designation: ";
+					getline(cin, designation);
+
+					Faculty* f = new Faculty(name, cnic, age, contact, empID, department, designation);
+					cout << "Faculty added successfully!" << endl;
+					delete f; // Just for demo
+					break;
+				}
+
+				case 3: {
+					// Add Course
+					string code, name;
+					int hours, capacity;
+
+					cout << "\n--- Add New Course ---" << endl;
+					cout << "Enter Course Code: ";
+					cin >> code;
+					cout << "Enter Course Name: ";
+					cin.ignore();
+					getline(cin, name);
+					cout << "Enter Credit Hours: ";
+					cin >> hours;
+					cout << "Enter Max Capacity: ";
+					cin >> capacity;
+
+					courses[courseCount] = new Course(code, name, hours, capacity);
+					courseCount++;
+					cout << "Course added successfully!" << endl;
+					break;
+				}
+
+				case 4: {
+					// Enroll Student
+					if (studentCount == 0 || courseCount == 0) {
+						cout << "Please add students and courses first!" << endl;
+						break;
+					}
+
+					cout << "\n--- Enroll Student in Course ---" << endl;
+					cout << "Available Students:" << endl;
+					for (int i = 0; i < studentCount; i++) {
+						students[i]->displayInfo();
+					}
+
+					int rollNo;
+					cout << "Enter Student Roll No: ";
+					cin >> rollNo;
+
+					Student* selectedStudent = NULL;
+					for (int i = 0; i < studentCount; i++) {
+						if (students[i]->getRollNo() == rollNo) {
+							selectedStudent = students[i];
+							break;
+						}
+					}
+
+					if (selectedStudent == NULL) {
+						cout << "Student not found!" << endl;
+						break;
+					}
+
+					cout << "Available Courses:" << endl;
+					for (int i = 0; i < courseCount; i++) {
+						courses[i]->displayCourse();
+					}
+
+					string courseCode;
+					cout << "Enter Course Code: ";
+					cin >> courseCode;
+
+					Course* selectedCourse = NULL;
+					for (int i = 0; i < courseCount; i++) {
+						if (courses[i]->getCourseCode() == courseCode) {
+							selectedCourse = courses[i];
+							break;
+						}
+					}
+
+					if (selectedCourse == NULL) {
+						cout << "Course not found!" << endl;
+						break;
+					}
+
+					try {
+						if (selectedCourse->enrollStudent(selectedStudent)) {
+							cout << "Student enrolled successfully!" << endl;
+						}
+					}
+					catch (CapacityExceededException e) {
+						cout << e.what() << endl;
+					}
+					break;
+				}
+
+				case 5: {
+					// Library Management
+					Library lib;
+					lib.addItem(new Book("B001", "C++ Programming", "Stroustrup", 2018, "978-0321", "Technical", 3));
+					lib.addItem(new Book("B002", "Data Structures", "Weiss", 2015, "978-0321", "Academic", 2));
+					lib.displayCatalog();
+
+					string title;
+					cout << "\nEnter book title to search: ";
+					cin.ignore();
+					getline(cin, title);
+					lib.searchByTitle(title);
+					break;
+				}
+
+				case 6: {
+					// Fee Management
+					if (studentCount == 0) {
+						cout << "No students available!" << endl;
+						break;
+					}
+
+					int rollNo;
+					cout << "Enter Student Roll No: ";
+					cin >> rollNo;
+
+					FeeRecord fee(rollNo, 50000, 30000);
+					fee.display();
+
+					double payment;
+					cout << "Enter payment amount: ";
+					cin >> payment;
+					fee -= payment;
+
+					Invoice inv("15-12-2024", payment);
+					inv.display();
+					break;
+				}
+
+				case 7: {
+					// Hostel Management
+					HostelBlock block("Azadi Block");
+					Room r1(101, 1, "double");
+					Room r2(102, 1, "single");
+					block.addRoom(&r1);
+					block.addRoom(&r2);
+
+					HostelManager hm;
+					hm.addBlock(&block);
+
+					int rollNo;
+					cout << "Enter Student Roll No for hostel allocation: ";
+					cin >> rollNo;
+					hm.allocateRoom(rollNo);
+					hm.generateReport();
+					break;
+				}
+
+				case 8: {
+					// Generate Reports
+					if (studentCount == 0) {
+						cout << "No students to display!" << endl;
+						break;
+					}
+
+					Library lib;
+					Reports::generateCampusReport(students, studentCount, &lib);
+					Reports::sortStudentsByGPA(students, studentCount);
+					break;
+				}
+
+				case 9: {
+					// Display All Students
+					if (studentCount == 0) {
+						cout << "No students added yet!" << endl;
+					}
+					else {
+						cout << "\n=== ALL STUDENTS ===" << endl;
+						for (int i = 0; i < studentCount; i++) {
+							students[i]->displayInfo();
+						}
+					}
+					break;
+				}
+
+				case 0:
+					cout << "Exiting system..." << endl;
+					break;
+
+				default:
+					cout << "Invalid choice!" << endl;
+				}
+
+			} while (choice != 0);
+
+			// Cleanup
+			for (int i = 0; i < studentCount; i++) {
+				delete students[i];
+			}
+			for (int i = 0; i < courseCount; i++) {
+				delete courses[i];
+			}
+
+			cout << "\n========== PROGRAM END ==========" << endl;
+
+			return 0;
+		}	
